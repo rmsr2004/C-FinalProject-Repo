@@ -6,13 +6,9 @@ Pretende-se desenvolver uma aplicação para auxiliar um funcionário de uma ofi
 sua manutenção.
 • Pré-reserva de lavagem ou manutenção – um cliente pretende reservar uma lavagem ou uma
 manutenção, mas não tem hora disponível e inscreve-se numa lista de espera para ter prioridade caso uma
-reserva seja cancelada.
-• Cancelar uma reserva - eliminar uma reserva. Se houver uma pré-reserva compatível com o horário
-e dia desocupado, esta será imediatamente enquadrada.
-• Cancelar uma pré-reserva - eliminar um pedido de pré-reserva.
-• Listar as reservas e as pré-reservas de lavagens e de manutenções ordenadas por data (as mais
-antigas primeiro).
-• Listar as reservas e as pré-reservas de um cliente ordenadas por data (as mais recentes primeiro).
+reserva seja cancelada. • Cancelar uma reserva - eliminar uma reserva. Se houver uma pré-reserva compatível com o horário
+e dia desocupado, esta será imediatamente enquadrada. • Cancelar uma pré-reserva - eliminar um pedido de pré-reserva. • Listar as reservas e as pré-reservas de lavagens e de manutenções ordenadas por data (as mais
+antigas primeiro). • Listar as reservas e as pré-reservas de um cliente ordenadas por data (as mais recentes primeiro).
 
 As vagas (horas de trabalho) vão das 8h00 às 18h00, sem hora de almoço. Uma lavagem de uma
 viatura demora meia hora e uma manutenção uma hora. Quando uma operação termina é eliminada da
