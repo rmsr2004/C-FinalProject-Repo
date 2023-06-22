@@ -1,7 +1,1 @@
-8-0-12-4-0-Rodrigo
-10-0-12-4-0-Manuel
-11-0-12-4-0-Rodrigo
-9-0-13-4-0-Manuel
-10-0-13-4-0-Manuel
-
-// espaços livres - 9h00 - 10h00
+10-0-12-4-0-Rodrigo
