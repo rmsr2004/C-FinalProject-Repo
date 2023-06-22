@@ -1,5 +1,5 @@
-#ifndef FILA_RESERVAS
-#define FILA_RESERVAS
+#ifndef LISTA_RESERVAS
+#define LISTA_RESERVAS
 
 struct conteudoLista{
     struct reserva{
