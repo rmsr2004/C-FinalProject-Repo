@@ -105,6 +105,10 @@ int cancelar_reserva(int tipo_de_reserva, pLista lista_ptr, tipoFila *fila_ptr){
     getchar();
     strcpy(reserva_a_cancelar.reserva.nome, input_string("Em que nome está marcada a reserva: "));
     
+
+    if(!procurar_reserva(reserva_a_cancelar, lista_ptr)){
+        return 0;
+    }
     struct conteudoFila pre_reserva_compativel = verificar_compatibilidade(reserva_a_cancelar, fila_ptr, lista_ptr);
     printf("Nome: %s\n", pre_reserva_compativel.pre_reserva.nome);
     printf("Dia: %d\n",pre_reserva_compativel.pre_reserva.data_pre_reserva.dia);
@@ -127,11 +131,13 @@ int cancelar_reserva(int tipo_de_reserva, pLista lista_ptr, tipoFila *fila_ptr){
             switch(escolha){
                 case 0:
                     struct conteudoLista reserva_compativel = pre_reserva_para_reserva(pre_reserva_compativel);
-                    if(insere_lista(lista_ptr, reserva_compativel) && removerReserva(lista_ptr, reserva_a_cancelar)){
-                        if(removerPreReserva(fila_ptr, pre_reserva_compativel, 1)){
-                            return 2;
+                    if(removerReserva(lista_ptr, reserva_a_cancelar)){
+                        if(insere_lista(lista_ptr, reserva_compativel)){
+                            if(removerPreReserva(fila_ptr, pre_reserva_compativel, 1)){
+                                return 2;
+                            }
+                            return -2;
                         }
-                        return -2;
                     }
                     return -1;
                     break;
@@ -405,7 +411,8 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
         return 1;
     }
 
-    int cont = 0, tempo_ocupado_reserva, tempo_ocupado_atual, tempo_ocupado_prox, hora_atual, hora_prox; 
+    int tempo_ocupado_reserva, tempo_ocupado_atual, hora_atual, hora_prox;
+
     int hora_reserva = hora_para_minutos(reserva.reserva.hora_reserva.hora, reserva.reserva.hora_reserva.minutos);
     if(reserva.reserva.tipo_reserva == 0){
         tempo_ocupado_reserva = 30;
@@ -413,84 +420,59 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
     else{
         tempo_ocupado_reserva = 60;
     }
+
     /* se a reserva passa das 18h00 */
-    printf("Estou a verificar se passo das 18\n");
     if((hora_reserva + tempo_ocupado_reserva) > hora_para_minutos(18,0)){
         return 0;
     }
+
     /* reserva e antes da primeira reserva */
     pLista listaOrdenada = ordenar_reservas_recentes(lista_ptr);
-    pLista aux = listaOrdenada->prox;
-
-    while(aux != NULL){
-        cont++;
-        aux = aux -> prox;
-    }
-    printf("Contador: %d\n", cont);
-    free(aux);
-
     pLista atual, proximo;
-    /* SÓ EXISTE UMA RESERVA NA LISTA */
-    if(cont == 1){
-        atual = listaOrdenada -> prox;
-        if(atual->itemLista.reserva.tipo_reserva == 0){
-            tempo_ocupado_atual = 30;
-        }
-        else{
-            tempo_ocupado_atual = 60;
-        }
-        hora_atual = hora_para_minutos(atual->itemLista.reserva.hora_reserva.hora, atual->itemLista.reserva.hora_reserva.minutos);
-        
-        /* verificaçoes necessarias (mesmo/diferente mes/dia)*/
-        /* se a reserva sobrepõe a única reserva presente na lista */
-        if(hora_reserva < (hora_atual + tempo_ocupado_atual)){
+    atual = listaOrdenada->prox;
+    proximo = atual->prox;
+
+    if(atual->itemLista.reserva.tipo_reserva == 0){
+        tempo_ocupado_atual = 30;
+    } else{
+        tempo_ocupado_atual = 60;
+    }
+    hora_atual = hora_para_minutos(atual->itemLista.reserva.hora_reserva.hora, atual->itemLista.reserva.hora_reserva.minutos);
+
+    /* inserir no ínicio da lista */
+    if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
+        reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia &&
+        reserva.reserva.hora_reserva.hora == atual->itemLista.reserva.hora_reserva.hora && 
+        reserva.reserva.hora_reserva.minutos < atual->itemLista.reserva.hora_reserva.minutos){
+        printf("Estou aqui\n");
+        if((hora_reserva + tempo_ocupado_reserva) > hora_atual){
             resultado = 0;
             goto retorno;
         }
-        resultado =  1;
+        resultado = 1;
+        goto retorno;
+    }
+    if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
+        reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia &&
+        reserva.reserva.hora_reserva.hora < atual->itemLista.reserva.hora_reserva.hora){
+        if((hora_reserva + tempo_ocupado_reserva) > hora_atual){
+            resultado = 0;
+            goto retorno;
+        }
+        resultado = 1;
+        goto retorno;
+    }
+    if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
+        reserva.reserva.data_reserva.dia < atual->itemLista.reserva.data_reserva.dia){
+        resultado = 1;
+        goto retorno;
+    }
+    if(reserva.reserva.data_reserva.mes < atual->itemLista.reserva.data_reserva.mes){
+        resultado = 1;
         goto retorno;
     }
     /* MAIS DE 1 RESERVA */
-    else{
-        atual = listaOrdenada->prox;
-        proximo = atual->prox;
-        if(atual->itemLista.reserva.tipo_reserva == 0){
-            tempo_ocupado_atual = 30;
-        } else{
-            tempo_ocupado_atual = 60;
-        }
-        hora_atual = hora_para_minutos(atual->itemLista.reserva.hora_reserva.hora, atual->itemLista.reserva.hora_reserva.minutos);
-        /* inserir no ínicio da lista */
-        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.hora_reserva.hora == atual->itemLista.reserva.hora_reserva.hora && 
-           reserva.reserva.hora_reserva.minutos < atual->itemLista.reserva.hora_reserva.minutos){
-            if((hora_reserva + tempo_ocupado_reserva) > hora_atual){
-                resultado = 0;
-                goto retorno;
-            }
-            resultado = 1;
-            goto retorno;
-        }
-        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia &&
-           reserva.reserva.hora_reserva.hora < atual->itemLista.reserva.hora_reserva.hora){
-            if((hora_reserva + tempo_ocupado_reserva) > hora_atual){
-                resultado = 0;
-                goto retorno;
-            }
-            resultado = 1;
-            goto retorno;
-        }
-        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.data_reserva.dia < atual->itemLista.reserva.data_reserva.dia){
-            resultado = 1;
-            goto retorno;
-        }
-        if(reserva.reserva.data_reserva.mes < atual->itemLista.reserva.data_reserva.mes){
-            resultado = 1;
-            goto retorno;
-        }
+    if(atual->prox != NULL){
         while(proximo != NULL){
             if(atual->itemLista.reserva.tipo_reserva == 0){
                 tempo_ocupado_atual = 30;
@@ -499,11 +481,6 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
             }
             hora_atual = hora_para_minutos(atual->itemLista.reserva.hora_reserva.hora, atual->itemLista.reserva.hora_reserva.minutos);
             
-            if(proximo->itemLista.reserva.tipo_reserva == 0){
-                tempo_ocupado_prox = 30;
-            } else{
-                tempo_ocupado_prox = 60;
-            }
             hora_prox = hora_para_minutos(proximo->itemLista.reserva.hora_reserva.hora, proximo->itemLista.reserva.hora_reserva.minutos);
             
             /* 
@@ -515,7 +492,8 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
                reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia &&
                reserva.reserva.data_reserva.mes == proximo->itemLista.reserva.data_reserva.mes &&
                reserva.reserva.data_reserva.dia == proximo->itemLista.reserva.data_reserva.dia){
-                if(hora_reserva > hora_atual && hora_reserva < hora_prox){
+                if((hora_reserva > hora_atual) && (hora_reserva < hora_prox)){
+                    printf("Hora reserva: %d\nHora Proximo: %d\nHora Atual: %d\n", hora_reserva, hora_prox, hora_atual);
                     if(hora_reserva < (hora_atual + tempo_ocupado_atual)){
                         resultado = 0;
                         goto retorno;
@@ -535,39 +513,40 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
                atual->itemLista.reserva.data_reserva.dia <= proximo->itemLista.reserva.data_reserva.dia &&
                reserva.reserva.data_reserva.dia >= atual->itemLista.reserva.data_reserva.dia &&
                reserva.reserva.data_reserva.dia <= proximo->itemLista.reserva.data_reserva.dia){
-                if((hora_reserva + tempo_ocupado_reserva) > hora_para_minutos(18,0)){
+                if((hora_reserva > hora_atual) && (hora_reserva < hora_prox)){
+                    if((hora_reserva + tempo_ocupado_reserva) > hora_para_minutos(18,0)){
+                        resultado = 0;
+                        goto retorno;
+                    }
+                    resultado = 1;
+                    goto retorno;
+               }
+            }
+
+            atual = atual ->prox;
+            proximo = proximo->prox;
+        }
+
+        if(atual->itemLista.reserva.tipo_reserva == 0){
+            tempo_ocupado_atual = 30;
+        } else{
+            tempo_ocupado_atual = 60;
+        }
+        hora_atual = hora_para_minutos(atual->itemLista.reserva.hora_reserva.hora, atual->itemLista.reserva.hora_reserva.minutos);
+
+        /* inserir no fim da lista */
+        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
+           reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia){
+            if(hora_reserva > hora_atual){
+                if((hora_atual + tempo_ocupado_atual) > hora_reserva){
                     resultado = 0;
                     goto retorno;
                 }
                 resultado = 1;
                 goto retorno;
             }
-            atual = atual ->prox;
-            proximo = proximo->prox;
         }
 
-        /* inserir no fim da lista */
-        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.hora_reserva.hora == atual->itemLista.reserva.hora_reserva.hora && 
-           reserva.reserva.hora_reserva.minutos > atual->itemLista.reserva.hora_reserva.minutos){
-            if((hora_atual + tempo_ocupado_atual) > hora_reserva){
-                resultado = 0;
-                goto retorno;
-            }
-            resultado = 1;
-            goto retorno;
-        }
-        if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
-           reserva.reserva.data_reserva.dia == atual->itemLista.reserva.data_reserva.dia &&
-           reserva.reserva.hora_reserva.hora > atual->itemLista.reserva.hora_reserva.hora){
-            if((hora_atual + tempo_ocupado_atual) > hora_reserva){
-                resultado = 0;
-                goto retorno;
-            }
-            resultado = 1;
-            goto retorno;
-        }
         if(reserva.reserva.data_reserva.mes == atual->itemLista.reserva.data_reserva.mes &&
            reserva.reserva.data_reserva.dia > atual->itemLista.reserva.data_reserva.dia){
             resultado = 1;
@@ -579,14 +558,32 @@ int verificar_disponibilidade(pLista lista_ptr, struct conteudoLista reserva){
         }
     } 
     
-    /* reserva depois da ultima reserva */
     retorno:
         destroi_lista(listaOrdenada);
         return resultado;
 }
 
 struct conteudoFila verificar_compatibilidade(struct conteudoLista reserva, tipoFila* fila_ptr, pLista lista_ptr){
-    int i = 0;
+    struct conteudoFila pre_reserva = reserva_para_pre_reserva(reserva);
+
+    pLista copia_original = copiarLista(lista_ptr);
+    removerReserva(copia_original, reserva);
+
+    noFila *atual = fila_ptr -> inicio;
+
+    while(atual != NULL){
+        if(atual->itemFila.pre_reserva.data_pre_reserva.dia == pre_reserva.pre_reserva.data_pre_reserva.dia && 
+           atual->itemFila.pre_reserva.data_pre_reserva.mes == pre_reserva.pre_reserva.data_pre_reserva.mes){
+            if(verificar_disponibilidade(copia_original, pre_reserva_para_reserva(atual->itemFila))){
+                destroi_lista(copia_original);
+                return atual->itemFila;
+            }
+        }
+        atual = atual->prox;
+    }
+
+    destroi_lista(copia_original);
+    return (struct conteudoFila) {{{0,0},{0,0}, "a", 0}};
 }
 
 int substituir_reserva(struct conteudoFila pre_reserva, pLista lista_ptr){
