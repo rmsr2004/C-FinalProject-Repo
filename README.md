@@ -1,24 +1,16 @@
-# C-FinalProject-Repo
+# TODO
 
-Pretende-se desenvolver uma aplicação para auxiliar um funcionário de uma oficina na gestão dassuas reservas. A aplicação deverá manter informação sobre os clientes e as horas disponíveis para reservas, bem como as reservas em espera. A aplicação deve permitir realizar, de forma interativa, as seguintes operações:
+The aim is to develop an application to help a workshop employee manage their bookings. The application should keep information on customers and the times available for bookings, as well as bookings on hold. The application should allow the following operations to be carried out interactively:
 
-• Reservar lavagem ou manutenção - um cliente faz uma reserva para lavar o carro ou para fazer a
-sua manutenção.
-• Pré-reserva de lavagem ou manutenção – um cliente pretende reservar uma lavagem ou uma
-manutenção, mas não tem hora disponível e inscreve-se numa lista de espera para ter prioridade caso uma
-reserva seja cancelada. • Cancelar uma reserva - eliminar uma reserva. Se houver uma pré-reserva compatível com o horário
-e dia desocupado, esta será imediatamente enquadrada. • Cancelar uma pré-reserva - eliminar um pedido de pré-reserva. • Listar as reservas e as pré-reservas de lavagens e de manutenções ordenadas por data (as mais
-antigas primeiro). • Listar as reservas e as pré-reservas de um cliente ordenadas por data (as mais recentes primeiro).
+- Book wash or maintenance - a customer makes a booking to have their car washed or serviced.
+ - Pre-book a wash or service - a customer wants to book a wash or service, but has no available time and signs up to a waiting list to be given priority if a booking is canceled. 
+- Cancel a reservation - delete a reservation. If there is a pre-booking compatible with the unoccupied time and day, it will be placed immediately.
+- Cancel a pre-booking - delete a pre-booking request. 
+- List washing and maintenance bookings and pre-bookings sorted by date (oldest first). -
+ List a customer's bookings and pre-bookings sorted by date (most recent first).
 
-As vagas (horas de trabalho) vão das 8h00 às 18h00, sem hora de almoço. Uma lavagem de uma
-viatura demora meia hora e uma manutenção uma hora. Quando uma operação termina é eliminada da
-lista de reservas respetiva.
+The working hours are from 8 a.m. to 6 p.m., with no lunch break. It takes half an hour to wash a car and an hour to carry out maintenance. When an operation finishes, it is deleted from the respective booking list.
 
-Na resolução deste problema, deve definir e usar estruturas de dados adequadas. A definição destas
-estruturas deve ser feita num ficheiro fonte autónomo. Valorizam-se soluções que sejam eficazes do ponto
-de vista do espaço de memória ocupado, nomeadamente soluções de ordenação que recorram a estruturas
-de dados auxiliares com apontadores para os registos reais em vez de estruturas com os próprios registos.
+To solve this problem, you must define and use appropriate data structures. These structures should be defined in a separate source file. Solutions that are efficient from the point of view of the memory space occupied are valued, namely sorting solutions that use auxiliary data structures with pointers to the actual records rather than structures with the records themselves.
 
-Toda a informação relevante deverá ser armazenada em ficheiros de texto. A aplicação deve ter uma
-opção para carregar a informação e outra para gravar o estado atual das reservas. O programa deve
-também ser devidamente protegido.
+All relevant information should be stored in text files. The application should have an option to load the information and another to save the current status of the reservations. The program should also be properly secured.
