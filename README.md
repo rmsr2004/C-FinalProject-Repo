@@ -1,4 +1,4 @@
-# TO DO
+# C Project - 1ºY 2ºS
 
 The aim is to develop an application to help a workshop employee manage their bookings. The application should keep information on customers and the times available for bookings, as well as bookings on hold. The application should allow the following operations to be carried out interactively:
 
